@@ -27,7 +27,13 @@ the statistical trap that makes naive calibration reports lie.
 3. **Measure.** `python3 scripts/judge_report.py labels.csv`
    (columns `item_id,gold,judge`) prints raw agreement with a
    Wilson interval, Cohen's kappa, gold prevalence, per-class
-   agreement, and the disagreement count.
+   agreement, the precision of each judge verdict, and the
+   disagreement count. Read the per-class numbers as two different
+   questions: agreement on gold-pass items is the judge's *recall*
+   for that class (of the items that should pass, how many it
+   caught); precision asks the reverse (of the items it passed,
+   how many should have passed). A judge can be strong on one and
+   weak on the other, and the pooled agreement will not tell you.
 4. **Read prevalence before kappa — always.** Kappa corrects for
    chance agreement, and when one gold class dominates, chance
    agreement is high and kappa collapses *by construction*. See the
@@ -75,13 +81,18 @@ Cohen's kappa:    0.647
 gold prevalence:  0.750
 agreement on gold-pass items: 0.944
 agreement on gold-fail items: 0.667
+precision of judge-pass calls: 0.895
+precision of judge-fail calls: 0.800
 disagreements:    3
 ```
 
 Reading it properly: overall agreement looks decent, but the
 per-class split shows the judge is much weaker exactly where it
 matters — it waves through a third of the items that should fail
-(agreement 0.667 on gold-fail). Jurisdiction decision: this judge
+(agreement 0.667 on gold-fail). Precision tells the same story from
+the verdict side: when this judge says "fail", it is right only
+0.800 of the time, so its fail verdicts also need review before
+anything is rejected on its say-so. Jurisdiction decision: this judge
 may pre-screen passes, but its *pass* verdicts on borderline items
 need review, and at n = 24 the interval (0.69–0.96) says the whole
 calibration is a smoke test, not a measurement. For comparison, a

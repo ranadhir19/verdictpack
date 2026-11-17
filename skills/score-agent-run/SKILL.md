@@ -74,8 +74,9 @@ Score each 0–100 with step-level evidence, or mark it n/a/UNTESTED.
 A judge may assist groundedness or outcome assessment, but its
 verdicts are reported *beside* the deterministic scores, never
 blended in — and only with its calibration printed next to them
-(agreement and kappa on a labelled set; see the calibrate-llm-judge
-skill). An unmeasured judge's score is a hope.
+(agreement, kappa, and per-class precision/recall on a labelled
+set; see the calibrate-llm-judge skill). An unmeasured judge's
+score is a hope.
 
 ## Test your scorer before trusting it
 

@@ -41,8 +41,9 @@ known error rate, and for refusing it when it misses a bound you set
 4. **Measure.** Run the bundled script:
    `python3 scripts/grader_report.py labels.csv`
    (CSV columns: `item_id,gold,grader`). It prints agreement with a
-   Wilson 95% interval, kappa, false-pass and false-fail counts, and
-   the verdict against the bound.
+   Wilson 95% interval, kappa, false-pass and false-fail counts,
+   per-class precision and recall, and the verdict against the
+   bound.
 5. **Read the disagreements.** Classify each one: formatting
    rejections (right answer, wrong shape), content false passes (a
    wrong answer the grader waved through — e.g. a number lifted from
@@ -68,13 +69,18 @@ agreement:        0.833  (Wilson 95% CI 0.641-0.933)
 Cohen's kappa:    0.667
 false passes:     1  (grader passed what gold fails)
 false fails:      3  (grader failed what gold passes)
+pass class:       precision 0.917 / recall 0.786
+fail class:       precision 0.750 / recall 0.900
 VERDICT: FALL BACK — the grader misses the frozen bound (agreement >= 0.90 and kappa >= 0.75).
 ```
 
 83% agreement *feels* fine. It is below the bound, its interval
 reaches down to 0.64, and its errors are asymmetric: three correct
 answers rejected (typically formatting) against one wrong answer
-passed. The correct action is not to lower the bound to 0.80 — it is
+passed. The per-class split names the asymmetry precisely — pass
+recall 0.786 (it misses more than a fifth of the correct answers)
+against fail recall 0.900 — so the repair is aimed at the false
+fails, not spread evenly. The correct action is not to lower the bound to 0.80 — it is
 to fix the grader's normalization (which usually recovers the false
 fails) or fall back to a stricter grader, then re-measure.
 

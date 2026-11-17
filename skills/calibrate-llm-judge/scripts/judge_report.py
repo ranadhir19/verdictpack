@@ -5,9 +5,14 @@ Reads a CSV with header: item_id,gold,judge
 Labels may be pass/fail, 1/0, true/false (case-insensitive).
 
 Prints: n, raw agreement with a Wilson 95% interval, Cohen's kappa,
-the prevalence of the modal gold class, per-class agreement, and the
-disagreement count. Two warnings are built in because they are the two
-ways judge calibration is most often misreported:
+the prevalence of the modal gold class, per-class agreement, the
+precision of each judge verdict, and the disagreement count.
+Agreement on gold-pass items is the judge's recall for the pass
+class (and likewise for fail); precision answers the complementary
+question — when the judge says pass, how often is it right? Report
+both: either one alone can hide a judge that is strong on one class
+and weak on the other. Two warnings are built in because they are
+the two ways judge calibration is most often misreported:
 
 - PREVALENCE: when one gold class dominates (share >= 0.90), kappa is
   depressed by construction and can sit near zero even at 95%+ raw
@@ -78,9 +83,16 @@ def stats(pairs):
     neg_items = [(g, j) for g, j in pairs if not g]
     pos_agree = (sum(1 for g, j in pos_items if g == j) / len(pos_items)) if pos_items else None
     neg_agree = (sum(1 for g, j in neg_items if g == j) / len(neg_items)) if neg_items else None
+    tp = sum(1 for g, j in pairs if g and j)
+    tn = sum(1 for g, j in pairs if not g and not j)
+    fp = sum(1 for g, j in pairs if not g and j)
+    fn = sum(1 for g, j in pairs if g and not j)
+    prec_pass = (tp / (tp + fp)) if (tp + fp) else None
+    prec_fail = (tn / (tn + fn)) if (tn + fn) else None
     return {
         "n": n, "agreement": po, "kappa": kappa, "prevalence": prevalence,
         "agree_n": agree_n, "pos_agree": pos_agree, "neg_agree": neg_agree,
+        "precision_pass": prec_pass, "precision_fail": prec_fail,
         "disagree": n - agree_n,
     }
 
@@ -96,6 +108,12 @@ def report(pairs, out=sys.stdout):
         print(f"agreement on gold-pass items: {s['pos_agree']:.3f}", file=out)
     if s["neg_agree"] is not None:
         print(f"agreement on gold-fail items: {s['neg_agree']:.3f}", file=out)
+    if s["precision_pass"] is not None:
+        print(f"precision of judge-pass calls: {s['precision_pass']:.3f}  "
+              "(of the items the judge passed, the share gold passes)", file=out)
+    if s["precision_fail"] is not None:
+        print(f"precision of judge-fail calls: {s['precision_fail']:.3f}  "
+              "(of the items the judge failed, the share gold fails)", file=out)
     print(f"disagreements:    {s['disagree']}  (read every one before trusting the judge)", file=out)
     if s["prevalence"] >= 0.90:
         print("WARNING — PREVALENCE: one gold class dominates, so kappa is "
@@ -119,6 +137,10 @@ def selftest():
     assert abs(s["agreement"] - 0.95) < 1e-9, s
     assert abs(s["kappa"] - 0.0) < 1e-9, s
     assert abs(s["prevalence"] - 0.95) < 1e-9, s
+    # The judge passed all 20 items: 19 gold-pass, 1 gold-fail, so its
+    # pass precision is 19/20 and it never issued a fail call at all.
+    assert abs(s["precision_pass"] - 0.95) < 1e-9, s
+    assert s["precision_fail"] is None, s
     out = io.StringIO()
     report(pairs, out=out)
     assert "PREVALENCE" in out.getvalue(), out.getvalue()

@@ -5,8 +5,9 @@ Reads a CSV with header: item_id,gold,grader
 Labels may be pass/fail, 1/0, true/false (case-insensitive).
 
 Prints: n, agreement with a Wilson 95% interval, Cohen's kappa, the
-false-pass and false-fail counts, and a verdict against the acceptance
-bound (default: agreement >= 0.90 AND kappa >= 0.75, the bound used in
+false-pass and false-fail counts, per-class precision and recall
+(agreement alone can hide a grader that is strong on one class and
+weak on the other), and a verdict against the acceptance bound (default: agreement >= 0.90 AND kappa >= 0.75, the bound used in
 the evalcrucible pre-registration). The bound is an input, never an
 output: set it before you run the grader, and do not move it after.
 
@@ -79,11 +80,23 @@ def report(pairs, min_agreement, min_kappa, out=sys.stdout):
     lo, hi = wilson(agree_n, n)
     false_pass = sum(1 for g, r in pairs if not g and r)
     false_fail = sum(1 for g, r in pairs if g and not r)
+    tp = sum(1 for g, r in pairs if g and r)
+    tn = sum(1 for g, r in pairs if not g and not r)
+
+    def div(a, b):
+        return (a / b) if b else None
+
+    def fmt(x):
+        return f"{x:.3f}" if x is not None else "n/a"
     print(f"items:            {n}", file=out)
     print(f"agreement:        {po:.3f}  (Wilson 95% CI {lo:.3f}-{hi:.3f})", file=out)
     print(f"Cohen's kappa:    {kappa:.3f}", file=out)
     print(f"false passes:     {false_pass}  (grader passed what gold fails)", file=out)
     print(f"false fails:      {false_fail}  (grader failed what gold passes)", file=out)
+    print(f"pass class:       precision {fmt(div(tp, tp + false_pass))} / "
+          f"recall {fmt(div(tp, tp + false_fail))}", file=out)
+    print(f"fail class:       precision {fmt(div(tn, tn + false_fail))} / "
+          f"recall {fmt(div(tn, tn + false_pass))}", file=out)
     ok = po >= min_agreement and kappa >= min_kappa
     bound = f"agreement >= {min_agreement:.2f} and kappa >= {min_kappa:.2f}"
     if ok:
@@ -112,8 +125,12 @@ def selftest():
     po, kappa = cohens_kappa(pairs)
     assert abs(po - 0.900) < 1e-9, po
     assert abs(kappa - 0.7917) < 1e-3, kappa
+    # Confusion on the fixture: tp=11, tn=7, fp=1, fn=1, so precision
+    # and recall are 11/12 and 11/12 (pass), 7/8 and 7/8 (fail).
     out = io.StringIO()
     code = report(pairs, 0.90, 0.75, out=out)
+    assert "precision 0.917 / recall 0.917" in out.getvalue(), out.getvalue()
+    assert "precision 0.875 / recall 0.875" in out.getvalue(), out.getvalue()
     assert code == 0 and "ACCEPT" in out.getvalue(), out.getvalue()
     out = io.StringIO()
     code = report(pairs, 0.95, 0.75, out=out)

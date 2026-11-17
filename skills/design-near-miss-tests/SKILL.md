@@ -39,6 +39,42 @@ question whose answer makes it answerable). Anything else —
 answering the base request, answering a neighbour, answering with
 the qualifier dropped — is silent substitution.
 
+## Two companion test classes
+
+Near-misses mutate supported requests. Two further classes complete
+the set, and neither is a mutation:
+
+**Result-cardinality scenarios.** For every feature that returns a
+set — search, listing, lookup, extraction over several records —
+test the three shapes of result separately, each with its own
+expectation written in advance:
+
+- **exactly one match** — that result, whole, with nothing added;
+- **several matches** — the complete set: none dropped, none
+  duplicated, none merged;
+- **no matches** — an honest empty result, reported as empty (the
+  empty-case operator above, applied to the set itself).
+
+Systems routinely pass the several-match shape while inventing a
+filler in the no-match shape or truncating the one-match shape; a
+single blended "search works" test cannot see any of that.
+
+**Standing invariants.** Checks that must hold on *every* response,
+whatever feature produced it and whatever mutation was applied.
+Write them once, run them across the whole set:
+
+- internal identifiers — record keys, UUIDs, internal codes — never
+  appear in user-facing output;
+- nothing is presented as retrieved, computed, or verified that the
+  run did not actually retrieve, compute, or verify;
+- the declared output contract holds throughout: language, format,
+  units, and any fields the contract promises or forbids.
+
+An answer can satisfy its required behaviour and still fail an
+invariant — the right result with an internal ID leaked into it is
+a failure. Invariants are also the cheapest tests in the set: most
+are pattern checks that run in milliseconds, on every change.
+
 ## Procedure
 
 1. **List the base set.** The requests the system demonstrably

@@ -59,6 +59,18 @@ text, structure, naming, or content from any existing pack is used.
 Every worked example is synthetic and original, and every number in
 an example is reproduced by the bundled scripts.
 
+A sixth skill, `layer-your-eval-program`, was added 2026-11-16
+after an audit of this pack against a published practitioner
+doctrine of LLM evaluation (Hamel Husain, "Your AI Product Needs
+Evals", 2024 — forwarded to the author as a summary with the source
+link). Per the same reference rule, only the *practices* were
+taken: cost-layered evaluation cadence, synthetic test-input
+generation, the pass rate as an explicit product decision, and
+per-class precision/recall reporting (the last also added to
+evalcrucible and to this pack's two measurement scripts in the same
+pass). All prose, examples, and code written for the addition are
+original to this repository.
+
 ## Licence and dependencies
 
 - This repository: MIT, see [LICENSE](LICENSE) (portfolio-standard

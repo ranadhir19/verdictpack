@@ -23,3 +23,21 @@ substituted answer is correct.
 | 6 | | boundary: just outside a limit | | refuse or clarify | limit silently stretched |
 | 7 | | boundary: just inside a limit | | answer-modified | over-refusal |
 | 8 | | carry-over: follow-up referring to earlier state | | answer-modified | context lost |
+
+## Companion rows (not mutations)
+
+Add one row per set-returning feature for each result shape, with the
+expectation written in advance:
+
+| # | Feature | Shape | Expectation |
+|---|---|---|---|
+| C1 | | exactly one match | that result, whole, nothing added |
+| C2 | | several matches | complete set — none dropped, duplicated, or merged |
+| C3 | | no matches | honest empty, reported as empty |
+
+And list the standing invariants once; they run against every row
+above, near-miss and companion alike:
+
+- <invariant 1 — e.g. internal identifiers never appear in output>
+- <invariant 2 — e.g. nothing presented as retrieved that was not retrieved>
+- <invariant 3 — e.g. output contract: language / format / units>
