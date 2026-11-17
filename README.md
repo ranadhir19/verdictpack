@@ -17,6 +17,13 @@ self-contained, executable by an agent with no other context, with
 a worked miniature example and, where counting is involved, a
 stdlib-only script whose numbers you can check.
 
+## Quickstart
+
+```bash
+git clone https://github.com/ranadhir19/verdictpack.git
+cp -r verdictpack/skills/* ~/.claude/skills/        # personal
+```
+
 ## The skills
 
 | Skill | What it does | Reach for it when |
