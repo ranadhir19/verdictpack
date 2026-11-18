@@ -1,6 +1,6 @@
 ---
 name: layer-your-eval-program
-description: Layer an AI product's evaluation programme by cost — fast deterministic tests on every change, human and model evaluation on a set cadence, live A/B comparison only once real users exist. Use when a team has scattered tests but no programme: no cadence, no pre-set pass bar, or model judges running before the cheap assertion layer exists. Includes generating synthetic test inputs against a feature-by-scenario grid and setting the acceptable pass rate as an explicit product decision.
+description: "Layer an AI product's evaluation programme by cost — fast deterministic tests on every change, human and model evaluation on a set cadence, live A/B comparison only once real users exist. Use when a team has scattered tests but no programme: no cadence, no pre-set pass bar, or model judges running before the cheap assertion layer exists. Includes generating synthetic test inputs against a feature-by-scenario grid and setting the acceptable pass rate as an explicit product decision."
 ---
 
 # Layer your eval program
